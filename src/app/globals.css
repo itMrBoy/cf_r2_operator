@@ -1,26 +1,245 @@
 @import "tailwindcss";
 
 :root {
+  /* 基础颜色 */
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* 卡片和容器 */
+  --card: #ffffff;
+  --card-foreground: #171717;
+  
+  /* 主要按钮 */
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  
+  /* 次要按钮 */
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  
+  /* 成功状态 */
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  
+  /* 警告状态 */
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  
+  /* 错误状态 */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  /* 边框和输入框 */
+  --border: #e2e8f0;
+  --input: #f8fafc;
+  --input-foreground: #0f172a;
+  
+  /* 静音文本 */
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  
+  /* 阴影 */
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* 圆角 */
+  --radius: 0.5rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-foreground: var(--input-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
+    /* 基础颜色 - 深色主题 */
     --background: #0a0a0a;
     --foreground: #ededed;
+    
+    /* 卡片和容器 */
+    --card: #171717;
+    --card-foreground: #ededed;
+    
+    /* 主要按钮 */
+    --primary: #3b82f6;
+    --primary-foreground: #ffffff;
+    
+    /* 次要按钮 */
+    --secondary: #262626;
+    --secondary-foreground: #fafafa;
+    
+    /* 成功状态 */
+    --success: #10b981;
+    --success-foreground: #ffffff;
+    
+    /* 警告状态 */
+    --warning: #f59e0b;
+    --warning-foreground: #ffffff;
+    
+    /* 错误状态 */
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    
+    /* 边框和输入框 */
+    --border: #404040;
+    --input: #262626;
+    --input-foreground: #fafafa;
+    
+    /* 静音文本 */
+    --muted: #262626;
+    --muted-foreground: #a3a3a3;
+    
+    /* 阴影 */
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
   }
+}
+
+.dark {
+  /* 基础颜色 - 深色主题 */
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  
+  /* 卡片和容器 */
+  --card: #171717;
+  --card-foreground: #ededed;
+  
+  /* 主要按钮 */
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  
+  /* 次要按钮 */
+  --secondary: #262626;
+  --secondary-foreground: #fafafa;
+  
+  /* 成功状态 */
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  
+  /* 警告状态 */
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  
+  /* 错误状态 */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  /* 边框和输入框 */
+  --border: #404040;
+  --input: #262626;
+  --input-foreground: #fafafa;
+  
+  /* 静音文本 */
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  
+  /* 阴影 */
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* 通用组件样式 */
+.theme-card {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.theme-input {
+  background: var(--input);
+  color: var(--input-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.theme-input:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.theme-button-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+  transition: all 0.2s ease-in-out;
+}
+
+.theme-button-primary:hover {
+  filter: brightness(0.9);
+}
+
+.theme-button-secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  border-radius: var(--radius);
+  transition: all 0.2s ease-in-out;
+}
+
+.theme-button-secondary:hover {
+  filter: brightness(0.95);
+}
+
+.theme-button-success {
+  background: var(--success);
+  color: var(--success-foreground);
+  border-radius: var(--radius);
+  transition: all 0.2s ease-in-out;
+}
+
+.theme-button-success:hover {
+  filter: brightness(0.9);
+}
+
+.theme-button-warning {
+  background: var(--warning);
+  color: var(--warning-foreground);
+  border-radius: var(--radius);
+  transition: all 0.2s ease-in-out;
+}
+
+.theme-button-warning:hover {
+  filter: brightness(0.9);
+}
+
+.theme-button-destructive {
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  border-radius: var(--radius);
+  transition: all 0.2s ease-in-out;
+}
+
+.theme-button-destructive:hover {
+  filter: brightness(0.9);
+}
+
+.theme-text-muted {
+  color: var(--muted-foreground);
 }
