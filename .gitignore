@@ -17,6 +17,8 @@
 /.next
 /out/
 
+/.codelf
+
 # production
 /build
 
