@@ -11,7 +11,8 @@ import {
     getFilePreviewUrl,
     downloadFileFromR2
 } from '@/app/apiFunc/r2-client';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { downloadFileFromObjectKey } from '@/utils';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 function R2DemoContent() {
     const { message } = App.useApp();
@@ -58,7 +59,11 @@ function R2DemoContent() {
         try {
             const response = await uploadFileToR2(bucketName, objectKey, selectedFile);
             hide();
-            message.success('文件上传成功！');
+            if (response.success) {
+                message.success(response.message || '文件上传成功！');
+            } else {
+                message.error(response.message || '文件上传失败！');
+            }
             setResult(JSON.stringify(response, null, 2));
         } catch (error) {
             hide();
@@ -80,7 +85,11 @@ function R2DemoContent() {
         try {
             const response = await uploadTextToR2(bucketName, objectKey, textContent);
             hide();
-            message.success('文本上传成功！');
+            if (response.success) {
+                message.success(response.message || '文本上传成功！');
+            } else {
+                message.error(response.message || '文本上传失败！');
+            }
             setResult(JSON.stringify(response, null, 2));
         } catch (error) {
             hide();
@@ -103,7 +112,11 @@ function R2DemoContent() {
             const jsonData = JSON.parse(jsonContent);
             const response = await uploadJsonToR2(bucketName, objectKey, jsonData);
             hide();
-            message.success('JSON上传成功！');
+            if (response.success) {
+                message.success(response.message || 'JSON上传成功！');
+            } else {
+                message.error(response.message || 'JSON上传失败！');
+            }
             setResult(JSON.stringify(response, null, 2));
         } catch (error) {
             hide();
@@ -120,7 +133,11 @@ function R2DemoContent() {
         try {
             const response = await getR2Buckets();
             hide();
-            message.success('获取存储桶列表成功！');
+            if (response.success) {
+                message.success(response.message || '获取存储桶列表成功！');
+            } else {
+                message.error(response.message || '获取存储桶列表失败！');
+            }
             setResult(JSON.stringify(response, null, 2));
         } catch (error) {
             hide();
@@ -142,7 +159,11 @@ function R2DemoContent() {
         try {
             const response = await getR2Objects(bucketName);
             hide();
-            message.success('获取对象列表成功！');
+            if (response.success) {
+                message.success(response.message || '获取对象列表成功！');
+            } else {
+                message.error(response.message || '获取对象列表失败！');
+            }
             setResult(JSON.stringify(response, null, 2));
         } catch (error) {
             hide();
@@ -166,13 +187,7 @@ function R2DemoContent() {
             if (response.ok) {
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = objectKey.split('/').pop() || 'download';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
+                downloadFileFromObjectKey(url, objectKey);
                 hide();
                 message.success(`下载 ${objectKey} 成功！`);
                 setResult(`下载 ${objectKey} 成功`);
@@ -198,7 +213,6 @@ function R2DemoContent() {
                     <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>
                         R2 存储演示
                     </h1>
-                    <ThemeToggle />
                 </div>
                 
                 <div className="space-y-6">
@@ -354,5 +368,9 @@ function R2DemoContent() {
 }
 
 export default function R2DemoPage() {
-    return <R2DemoContent />;
+    return (
+        <ProtectedRoute>
+            <R2DemoContent />
+        </ProtectedRoute>
+    );
 } 
