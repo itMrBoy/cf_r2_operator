@@ -1,3 +1,5 @@
+import { apiRequest } from '@/utils/api';
+
 /**
  * R2 客户端工具 - 用于前端调用API路由
  * 解决了直接调用AWS SDK的跨域问题
@@ -27,12 +29,12 @@ export async function uploadFileToR2(
     }
 
     try {
-        const response = await fetch('/api/r2/upload', {
+        const response = await apiRequest('/r2/upload', {
             method: 'POST',
             body: formData,
         });
 
-        return await response.json();
+        return response.data as R2Response;
     } catch (error) {
         return {
             success: false,
@@ -55,12 +57,12 @@ export async function uploadTextToR2(
     formData.append('textContent', textContent);
 
     try {
-        const response = await fetch('/api/r2/upload', {
+        const response = await apiRequest('/r2/upload', {
             method: 'POST',
             body: formData,
         });
 
-        return await response.json();
+        return response.data as R2Response;
     } catch (error) {
         return {
             success: false,
@@ -83,12 +85,12 @@ export async function uploadJsonToR2(
     formData.append('jsonData', JSON.stringify(jsonData));
 
     try {
-        const response = await fetch('/api/r2/upload', {
+        const response = await apiRequest('/r2/upload', {
             method: 'POST',
             body: formData,
         });
 
-        return await response.json();
+        return response.data as R2Response;
     } catch (error) {
         return {
             success: false,
@@ -111,7 +113,15 @@ export async function downloadFileFromR2(
         download: download.toString()
     });
 
-    return fetch(`/api/r2/download?${params}`);
+    try {
+        const response = await apiRequest(`/r2/download?${params}`);
+        if (!response.success) {
+            throw new Error(response.message || '下载失败');
+        }
+        return response.data as Response;
+    } catch (error) {
+        throw new Error(`下载文件失败: ${error instanceof Error ? error.message : '未知错误'}`);
+    }
 }
 
 /**
@@ -119,8 +129,8 @@ export async function downloadFileFromR2(
  */
 export async function getR2Buckets(): Promise<R2Response> {
     try {
-        const response = await fetch('/api/r2/list');
-        return await response.json();
+        const response = await apiRequest('/r2/list');
+        return response.data as R2Response;
     } catch (error) {
         return {
             success: false,
@@ -135,8 +145,8 @@ export async function getR2Buckets(): Promise<R2Response> {
 export async function getR2Objects(bucketName: string): Promise<R2Response> {
     try {
         const params = new URLSearchParams({ bucket: bucketName });
-        const response = await fetch(`/api/r2/list?${params}`);
-        return await response.json();
+        const response = await apiRequest(`/r2/list?${params}`);
+        return response.data as R2Response;
     } catch (error) {
         return {
             success: false,
