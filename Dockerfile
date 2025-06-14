@@ -39,8 +39,15 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=cache,target=/root/.npm \
     npm ci
 
+# Copy the Prisma schema files
+COPY prisma ./prisma
+
+# Generate Prisma Client
+RUN npx prisma generate
+
 # Copy the rest of the source files into the image.
 COPY . .
+
 # Run the build script.
 RUN npm run build
 
@@ -63,8 +70,15 @@ COPY package.json .
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/.next ./.next
 
+# Copy Prisma schema and generated client
+COPY --from=build /usr/src/app/prisma ./prisma
+COPY --from=build /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+
+# Create a directory for the database (SQLite)
+RUN mkdir -p /usr/src/app/prisma
+
 # Expose the port that the application listens on.
 EXPOSE 30000
 
-# Run the application.
-CMD npm start
+# Run database migrations and start the application
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
