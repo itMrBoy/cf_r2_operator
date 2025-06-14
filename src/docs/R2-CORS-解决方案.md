@@ -26,14 +26,23 @@
 src/
 ├── utils/
 │   ├── cfr2.ts           # R2服务端工具函数
-│   └── r2-client.ts      # 前端客户端工具
+│   ├── api.ts            # 通用API请求工具
+│   ├── index.ts          # 公共工具函数（如文件下载）
+│   ├── useToken.ts       # Token管理工具
+│   └── CONTENT_TYPE.ts   # 内容类型常量
 ├── app/
-│   ├── api/r2/
-│   │   ├── upload/route.ts   # 上传API路由
-│   │   ├── download/route.ts # 下载API路由
-│   │   └── list/route.ts     # 列表API路由
-│   └── r2-demo/
-│       └── page.tsx      # 演示页面
+│   ├── api/
+│   │   └── r2/
+│   │       ├── upload/route.ts   # 上传API路由
+│   │       ├── download/route.ts # 下载API路由
+│   │       └── list/route.ts     # 列表API路由
+│   ├── apiFunc/
+│   │   ├── r2-client.ts  # R2前端客户端工具
+│   │   └── authApi.ts    # 认证API工具
+│   └── page.tsx          # R2演示页面（主页）
+├── components/
+│   └── ProtectedRoute.tsx # 路由保护组件
+└── middleware.ts         # 中间件（认证验证）
 ```
 
 ## 核心组件说明
@@ -60,18 +69,39 @@ src/
 - 获取存储桶列表
 - 获取对象列表
 
-### 3. 前端客户端 (`src/utils/r2-client.ts`)
+### 3. 前端客户端 (`src/app/apiFunc/r2-client.ts`)
 
 - 封装API调用
 - 提供TypeScript类型支持
 - 简化前端使用
+
+### 4. 公共工具 (`src/utils/index.ts`)
+
+- 文件下载功能
+- 文件名提取工具
+- 其他通用工具函数
+
+### 5. 认证系统
+
+#### 中间件 (`src/middleware.ts`)
+- JWT token验证
+- 路由保护
+- 自动添加用户信息到请求头
+
+#### 认证API (`src/app/apiFunc/authApi.ts`)
+- 登录/注册接口封装
+- 统一的响应格式
+
+#### Token管理 (`src/utils/useToken.ts`)
+- Token存储和获取
+- 自动清理过期token
 
 ## 使用示例
 
 ### 上传文件
 
 ```typescript
-import { uploadFileToR2 } from '@/utils/r2-client';
+import { uploadFileToR2 } from '@/app/apiFunc/r2-client';
 
 const handleUpload = async (file: File) => {
     const result = await uploadFileToR2('my-bucket', 'path/file.jpg', file);
@@ -82,7 +112,7 @@ const handleUpload = async (file: File) => {
 ### 上传文本
 
 ```typescript
-import { uploadTextToR2 } from '@/utils/r2-client';
+import { uploadTextToR2 } from '@/app/apiFunc/r2-client';
 
 const result = await uploadTextToR2('my-bucket', 'notes.txt', 'Hello World');
 ```
@@ -90,28 +120,48 @@ const result = await uploadTextToR2('my-bucket', 'notes.txt', 'Hello World');
 ### 下载文件
 
 ```typescript
-import { downloadFileFromR2 } from '@/utils/r2-client';
+import { downloadFileFromR2 } from '@/app/apiFunc/r2-client';
+import { downloadFileFromObjectKey } from '@/utils';
 
 const response = await downloadFileFromR2('my-bucket', 'path/file.jpg', true);
-// 自动触发浏览器下载
+if (response.ok) {
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    downloadFileFromObjectKey(url, 'path/file.jpg'); // 使用公共下载工具
+}
 ```
 
 ### 获取预览链接
 
 ```typescript
-import { getFilePreviewUrl } from '@/utils/r2-client';
+import { getFilePreviewUrl } from '@/app/apiFunc/r2-client';
 
 const previewUrl = getFilePreviewUrl('my-bucket', 'image.jpg');
 // 可用于 <img src={previewUrl} />
 ```
 
+### 认证保护的页面
+
+```typescript
+import ProtectedRoute from '@/components/ProtectedRoute';
+
+export default function MyPage() {
+    return (
+        <ProtectedRoute>
+            <div>受保护的内容</div>
+        </ProtectedRoute>
+    );
+}
+```
+
 ## 优势
 
-1. **安全性**: 凭据不暴露给客户端
+1. **安全性**: 凭据不暴露给客户端，JWT认证保护API
 2. **无跨域问题**: 前端调用同域API
 3. **灵活性**: 可以添加额外的业务逻辑和验证
 4. **易维护**: 集中的错误处理和日志记录
 5. **兼容性**: 支持所有现代浏览器
+6. **认证集成**: 完整的用户认证和授权系统
 
 ## 替代方案
 
@@ -122,7 +172,7 @@ const previewUrl = getFilePreviewUrl('my-bucket', 'image.jpg');
 ```json
 [
   {
-    "AllowedOrigins": ["http://localhost:3000", "https://yourdomain.com"],
+    "AllowedOrigins": ["http://localhost:1300", "https://yourdomain.com"],
     "AllowedMethods": ["GET", "PUT", "POST", "DELETE"],
     "AllowedHeaders": ["*"],
     "ExposeHeaders": ["ETag"],
@@ -157,11 +207,14 @@ const signedUrl = await getSignedUrl(S3, command, { expiresIn: 3600 });
 - 完全解决跨域问题
 - 便于添加业务逻辑
 - 易于维护和扩展
+- 集成完整的认证系统
 
 ## 注意事项
 
-1. **环境变量**: 确保AWS凭据通过环境变量安全配置
+1. **环境变量**: 确保AWS凭据和JWT密钥通过环境变量安全配置
 2. **错误处理**: 实施完善的错误处理和日志记录
 3. **文件大小**: 注意Next.js的请求体大小限制
 4. **性能**: 对于大文件可以考虑分片上传
-5. **权限**: 根据需要添加身份验证和授权 
+5. **权限**: 通过JWT token进行身份验证和授权
+6. **中间件**: 确保API路由受到适当的认证保护
+7. **开发端口**: 开发服务器运行在端口1300而非默认的3000 
