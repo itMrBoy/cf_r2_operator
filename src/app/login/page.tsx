@@ -37,6 +37,9 @@ export default function LoginPage() {
     // 使用新的setToken方法存储token
     setToken(data.token);
     
+    // 触发自定义事件通知其他组件
+    window.dispatchEvent(new CustomEvent('auth-changed'));
+    
     // 跳转到首页
     router.push('/');
   };

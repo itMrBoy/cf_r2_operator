@@ -10,13 +10,25 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    const checkAuthStatus = () => {
+      const token = localStorage.getItem('token');
+      setIsLoggedIn(!!token);
+    };
+
+    // 初始检查
+    checkAuthStatus();
+
+    // 监听认证状态变化
+    window.addEventListener('auth-changed', checkAuthStatus);
+
+    return () => {
+      window.removeEventListener('auth-changed', checkAuthStatus);
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    setIsLoggedIn(false);
+    window.dispatchEvent(new CustomEvent('auth-changed'));
     router.push('/login');
   };
 
