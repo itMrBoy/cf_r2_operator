@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AntdProvider } from "@/components/antd-provider";
 import Navbar from '@/components/Navbar';
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
+        <Script strategy="lazyOnload" src="https://umami.tianran.org/script.js" data-website-id="47a41135-467d-4ffa-bdfd-ea81559bb099" data-tag="study.tianran.org" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

@@ -103,6 +103,9 @@ export default function RegisterPage() {
             <button
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 theme-button-primary text-sm font-medium rounded-xl"
+              data-umami-event="Signup button"
+              data-umami-event-id={formData.username}
+              data-umami-event-name={formData.username}
             >
               注册
             </button>

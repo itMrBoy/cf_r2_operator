@@ -98,6 +98,9 @@ export default function LoginPage() {
             <button
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 theme-button-primary text-sm font-medium rounded-xl"
+              data-umami-event="Login button"
+              data-umami-event-id={formData.username}
+              data-umami-event-name={formData.username}
             >
               登录
             </button>

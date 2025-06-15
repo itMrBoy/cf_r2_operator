@@ -59,16 +59,31 @@ function R2DemoContent() {
         try {
             const response = await uploadFileToR2(bucketName, objectKey, selectedFile);
             hide();
+            const retMsg = response.message;
             if (response.success) {
-                message.success(response.message || '文件上传成功！');
+                message.success(retMsg || '文件上传成功！');
+                setResult(JSON.stringify(response, null, 2));
+                umami.track('File Upload Success', { 
+                    bucket: bucketName, 
+                    fileSize: selectedFile.size,
+                    fileName: selectedFile.name 
+                });
             } else {
-                message.error(response.message || '文件上传失败！');
+                message.error(retMsg || '文件上传失败！');
+                setResult(`错误: ${retMsg || '文件上传失败！'}`);
+                umami.track('File Upload Error', { 
+                    bucket: bucketName, 
+                    error: String(retMsg || '文件上传失败！') 
+                });
             }
-            setResult(JSON.stringify(response, null, 2));
         } catch (error) {
             hide();
             message.error(`上传失败: ${error}`);
             setResult(`错误: ${error}`);
+            umami.track('File Upload Error', { 
+                bucket: bucketName, 
+                error: `上传失败: ${error}`
+            });
         } finally {
             setButtonLoading('fileUpload', false);
         }
@@ -85,16 +100,30 @@ function R2DemoContent() {
         try {
             const response = await uploadTextToR2(bucketName, objectKey, textContent);
             hide();
-            if (response.success) {
-                message.success(response.message || '文本上传成功！');
+            const retMsg = response.message
+            if (response.success) {;
+                message.success(retMsg || '文本上传成功！');
+                setResult(JSON.stringify(response, null, 2));
+                umami.track('Text Upload Success', { 
+                    bucket: bucketName, 
+                    contentLength: textContent.length 
+                });
             } else {
-                message.error(response.message || '文本上传失败！');
+                message.error(retMsg || '文本上传失败！');
+                setResult(`错误: ${retMsg || '文本上传失败！'}`);
+                umami.track('Text Upload Error', { 
+                    bucket: bucketName, 
+                    error: retMsg || '文本上传失败！'
+                });
             }
-            setResult(JSON.stringify(response, null, 2));
         } catch (error) {
             hide();
             message.error(`上传失败: ${error}`);
             setResult(`错误: ${error}`);
+            umami.track('Text Upload Error', { 
+                bucket: bucketName, 
+                error: `上传失败: ${error}`
+            });
         } finally {
             setButtonLoading('textUpload', false);
         }
@@ -112,16 +141,30 @@ function R2DemoContent() {
             const jsonData = JSON.parse(jsonContent);
             const response = await uploadJsonToR2(bucketName, objectKey, jsonData);
             hide();
+            const retMsg = response.message
             if (response.success) {
-                message.success(response.message || 'JSON上传成功！');
+                message.success(retMsg || 'JSON上传成功！');
+                setResult(JSON.stringify(response, null, 2));
+                umami.track('JSON Upload Success', { 
+                    bucket: bucketName, 
+                    contentLength: jsonContent.length 
+                });
             } else {
-                message.error(response.message || 'JSON上传失败！');
+                message.error(retMsg || 'JSON上传失败！');
+                setResult(`错误: ${retMsg || 'JSON上传失败！'}`);
+                umami.track('JSON Upload Error', { 
+                    bucket: bucketName, 
+                    error: retMsg || 'JSON上传失败！'
+                });
             }
-            setResult(JSON.stringify(response, null, 2));
         } catch (error) {
             hide();
             message.error(`上传失败: ${error}`);
             setResult(`错误: ${error}`);
+            umami.track('JSON Upload Error', { 
+                bucket: bucketName, 
+                error: `上传失败: ${error}`
+            });
         } finally {
             setButtonLoading('jsonUpload', false);
         }
@@ -191,15 +234,29 @@ function R2DemoContent() {
                 hide();
                 message.success(`下载 ${objectKey} 成功！`);
                 setResult(`下载 ${objectKey} 成功`);
+                umami.track('File Download Success', { 
+                    bucket: bucketName, 
+                    fileName: objectKey 
+                });
             } else {
                 hide();
                 message.error(`下载失败: ${response.statusText}`);
                 setResult(`下载失败: ${response.statusText}`);
+                umami.track('File Download Error', { 
+                    bucket: bucketName, 
+                    fileName: objectKey,
+                    error: response.statusText 
+                });
             }
         } catch (error) {
             hide();
             message.error(`下载失败: ${error}`);
             setResult(`错误: ${error}`);
+            umami.track('File Download Error', { 
+                bucket: bucketName, 
+                fileName: objectKey,
+                error: String(error) 
+            });
         } finally {
             setButtonLoading('download', false);
         }
