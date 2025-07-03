@@ -54,3 +54,5 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: '/api/:path*',
 }; 
+
+console.log(process.env.JWT_SECRET)
